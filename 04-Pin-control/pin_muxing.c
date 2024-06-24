@@ -119,6 +119,7 @@ static int my_pdrv_remove(struct platform_device *pdev) {
     class_destroy(mdev.m_class);
     cdev_del(&mdev.m_cdev);
     unregister_chrdev_region(mdev.dev_num, 3);
+    pwm_disable(gpio_pwm.pwm);
     printk(KERN_INFO "hungphan exit\n");
     return 0;
 }
