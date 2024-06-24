@@ -1,0 +1,43 @@
+--- a/arch/arm/boot/dts/am335x-boneblack.dts	2024-06-24 23:02:22.026918020 +0700
++++ b/arch/arm/boot/dts/am335x-boneblack.dts	2024-06-24 23:00:49.547522212 +0700
+@@ -173,3 +173,40 @@
+ 		"NC";
+ };
+ 
++
++&am33xx_pinmux {
++	ehrpwm1_pins: ehrpwm1_pins {
++		pinctrl-single,pins = <
++			AM33XX_IOPAD(0x848, PIN_OUTPUT | MUX_MODE6) /* P9.14, EHRPWM1A */
++		>;
++	};
++
++	gpio_pins: gpio_pins {
++		pinctrl-single,pins = <
++			AM33XX_IOPAD(0x848, PIN_OUTPUT | MUX_MODE7) /* P9.14, gpio50 */
++		>;
++	};
++};
++
++&epwmss1 {
++	status = "okay";
++};
++
++&ehrpwm1 {
++	#pwm-cells = <2>;
++	status = "okay";
++};
++
++/ {
++	foo_device {
++		compatible = "gpio-descriptor-based";
++		pinctrl-names = "default", "sleep";
++		pinctrl-0 = <&ehrpwm1_pins>;
++		pinctrl-1 = <&gpio_pins>;
++		led30-gpios = <&gpio1 18 GPIO_ACTIVE_HIGH>;	/** gpio1_18 */
++		pwms = <&ehrpwm1 0 5000000>;
++		max-brightness = <255>;
++		default-state = "off";
++		status = "okay";
++	};
++};

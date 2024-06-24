@@ -190,7 +190,7 @@ static ssize_t m_write(struct file *file, const char __user *buf, size_t count, 
         pinctrl_select_state(gpio_pwm.pinctrl, gpio_pwm.pinctrl_pwm);
 
         // Get PWM period
-        period = pwm_get_period(gpio_pwm.pwm);
+        period = 5000000;
         printk(KERN_INFO "PWM period: %lu\n", period);
 
         if (value >= 0 && value <= PWM_MAX_DUTY_CYCLE) {
