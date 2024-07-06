@@ -1,0 +1,74 @@
+--- a/arch/arm/boot/dts/am335x-boneblack.dts	2024-06-24 23:02:22.026918020 +0700
++++ b/arch/arm/boot/dts/am335x-boneblack.dts	2024-06-24 23:00:49.547522212 +0700
+@@ -172,5 +172,69 @@
+ 		 "NC",
+ 		 "NC";
+  };
+-
++ 
++ 
++ &am33xx_pinmux {
++	 ehrpwm1_pins: ehrpwm1_pins {
++		 pinctrl-single,pins = <
++			 AM33XX_IOPAD(0x848, PIN_OUTPUT | MUX_MODE6) /* P9.14, EHRPWM1A */
++		 >;
++	 };
++ 
++	 gpio_pins: gpio_pins {
++		 pinctrl-single,pins = <
++			 AM33XX_IOPAD(0x848, PIN_OUTPUT | MUX_MODE7) /* P9.14, gpio50 */
++		 >;
++	 };
++ 
++	 spi1_pins: spi1_pins {
++		 pinctrl-single,pins = <
++			 AM33XX_PADCONF(AM335X_PIN_MCASP0_ACLKX, PIN_INPUT_PULLUP, MUX_MODE3)   // P9_31 - SPI1_SCLK
++			 AM33XX_PADCONF(AM335X_PIN_MCASP0_FSX, PIN_INPUT_PULLUP, MUX_MODE3)     // P9_29 - SPI1_D0 (MISO)
++			 AM33XX_PADCONF(AM335X_PIN_MCASP0_AXR0, PIN_INPUT_PULLUP, MUX_MODE3)    // P9_30 - SPI1_D1 (MOSI)
++			 AM33XX_PADCONF(AM335X_PIN_MCASP0_AHCLKR, PIN_OUTPUT_PULLUP, MUX_MODE7) // P9_28 - SPI1_CS0 (GPIO)
++			 AM33XX_PADCONF(AM335X_PIN_GPMC_A0, PIN_OUTPUT, MUX_MODE7)   // P9_15 - DC GPIO1_16
++			 AM33XX_PADCONF(AM335X_PIN_GPMC_A1, PIN_OUTPUT, MUX_MODE7)   // P9_23 - RESET GPIO1_17
++		 >;
++	 };
++ };
++ 
++ &epwmss1 {
++	 status = "okay";
++ };
++ 
++ &ehrpwm1 {
++	 #pwm-cells = <2>;
++	 status = "okay";
++ };
++ 
++ / {
++	 foo_device {
++		 compatible = "gpio-descriptor-based";
++		 pinctrl-names = "default", "sleep";
++		 pinctrl-0 = <&ehrpwm1_pins>;
++		 pinctrl-1 = <&gpio_pins>;
++		 led30-gpios = <&gpio1 18 GPIO_ACTIVE_HIGH>;	/** gpio1_18 */
++		 pwms = <&ehrpwm1 0 5000000>;
++		 max-brightness = <255>;
++		 default-state = "off";
++		 status = "okay";
++	 };
++ };
++ 
++ &spi1 {
++	 cs-gpios = <&gpio3 17 0> ;
++	 pinctrl-names = "default";
++	 pinctrl-0 = <&spi1_pins>;
++	 status = "okay";
++ 
++	 ssd1306: ssd1306@0 {
++		 compatible = "ssd1306";
++		 spi-max-frequency = <2000000>;
++		 reg = <0>;
++		 dc-gpios = <&gpio1 16 0>;  // GPIO1_16 for DC
++		 reset-gpios = <&gpio1 17 0>;  // GPIO1_17 for RESET
++		 status = "okay";
++	 };
++ };
+  
+\ No newline at end of file
