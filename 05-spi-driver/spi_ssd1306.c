@@ -13,6 +13,8 @@
 #define SSD1306_MAX_LINE 7
 #define SSD1306_DEF_FONT_SIZE 5
 
+// echo string > /dev/ssd1306
+
 
 // Define GPIO pins
 #define DC_PIN 48
@@ -393,13 +395,7 @@ static int m_open(struct inode *inode, struct file *file)
     printk(KERN_INFO "Device has been opened\n");
 	struct ssd1306_spi_module *module = NULL;
 	struct spi_device *spi;
-	// module = container_of(inode->i_cdev, struct ssd1306_spi_module, dev);
-	// if (!module) {
-	// 	printk(KERN_INFO "m_open: module is null\n");
-    //     return -ENOMEM;
-    // }
 
-	printk(KERN_INFO "m_open: front size = %d\n", module1->font_size);
     file->private_data = module1;
     return 0;
 }
@@ -423,25 +419,17 @@ static ssize_t m_write(struct file *file, const char __user *buf, size_t count, 
         printk(KERN_ERR "Failed to allocate memory\n");
         return -ENOMEM;
     }
-	printk(KERN_INFO "m_write: 2\n");
-
 
     // Copy data from userspace to kernel space
     if (copy_from_user(kbuf, buf, count)) {
         kfree(kbuf);
         return -EFAULT;
     }
-	printk(KERN_INFO "m_write: 3\n");
 
 
     // Null-terminate the string
     kbuf[count] = '\0';
 	printk(KERN_INFO "m_write: received buffer: %s\n", kbuf);
-
-
-	//module = (struct ssd1306_spi_module *)file->private_data;
-	printk(KERN_INFO "m_write: front size = %d\n", module->font_size);
-	printk(KERN_INFO "m_write: 4\n");
 	
     if (!module) {
         printk(KERN_INFO "m_write: module is null\n");
@@ -451,12 +439,10 @@ static ssize_t m_write(struct file *file, const char __user *buf, size_t count, 
 
     // Clear the screen
     ssd1306_clear(module);
-	printk(KERN_INFO "m_write: 5\n");
 
 
     // Print the string on the screen
     ssd1306_print_string(module, (unsigned char *)kbuf);
-	printk(KERN_INFO "m_write: 6\n");
 
 
     // Free the allocated memory
