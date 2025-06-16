@@ -1,0 +1,5 @@
+add 2 lines to /boot/uEnv:
+uboot_overlay_addr4=/lib/firmware/i2c1_enable.dtbo
+enable_uboot_overlays=1
+
+- copy dtbo to /lib/firmware and reboot 
