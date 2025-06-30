@@ -1,0 +1,46 @@
+/dts-v1/;
+/plugin/;
+
+/ {
+    compatible = "ti,beaglebone", "ti,beaglebone-black";
+    part-number = "uart_dma";
+    version = "00A0";
+
+    /* Fragment 0: Configure UART4 TX/RX pins */
+    fragment@0 {
+        target = <&am33xx_pinmux>;
+        __overlay__ {
+            uart4_pins: pinmux_uart4_pins {
+                pinctrl-single,pins = <
+                    0x070 0x26  /* P9_11 (UART4_RXD), MODE6, input enabled */
+                    0x074 0x06  /* P9_13 (UART4_TXD), MODE6, output */
+                >;
+            };
+        };
+    };
+
+    /* Fragment 1: Enable UART4 and configure DMA */
+    fragment@1 {
+        target = <&uart4>;
+        __overlay__ {
+            status = "okay";
+            pinctrl-names = "default";
+            pinctrl-0 = <&uart4_pins>;
+
+            dmas = <&edma 52>, <&edma 53>;  /* TX = 52, RX = 53 from xbar */
+            dma-names = "tx", "rx";
+        };
+    };
+
+    
+    fragment@2 {
+        target-path = "/";
+        __overlay__ {
+            uart4_test: uart4-test {
+                compatible = "uart4-dma";
+                status = "okay";
+            };
+        };
+    };
+};
+
